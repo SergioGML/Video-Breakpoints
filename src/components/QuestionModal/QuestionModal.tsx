@@ -2,7 +2,7 @@ import { questions } from "../../data/questions";
 import { useHomeContext } from "../../context/HomeContext";
 
 
-const QuestionModal: React.FC= () => {
+const QuestionModal = () => {
 
   const { setIsCorrect, activeQuestion, setActiveQuestion, setShouldResume, isCorrect} = useHomeContext();  
 

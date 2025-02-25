@@ -33,12 +33,11 @@ export const UseVideoPlayer = () => {
         setCurrentTime(time);
 
         // Revisar si el tiempo coincide con un breakpoint
-        const questionIndex = questions.findIndex(
-          (q) => Math.floor(q.time) === Math.floor(time),
-        );
-        if (questionIndex !== -1) {
+        const foundQuestion = questions.some((q) => Math.floor(q.time) === Math.floor(time));
+        if (foundQuestion) {
           playerRef.current.pauseVideo();
           setIsPaused(true);
+          const questionIndex = questions.findIndex((q) => Math.floor(q.time) === Math.floor(time));
           handleQuestionTrigger(questionIndex);
         }
       }
