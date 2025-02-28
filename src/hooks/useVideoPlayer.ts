@@ -1,14 +1,17 @@
-import  { useRef, useEffect, useState } from "react";
-import  { YouTubeEvent, YouTubePlayer } from "react-youtube";
+// useVideoPlayer.ts
+import { useRef, useEffect, useState } from "react";
+import { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import { questions } from "../data/questions";
 import { useHomeContext } from "../context/HomeContext";
-
 
 export const UseVideoPlayer = () => {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const { handleQuestionTrigger, shouldResume, setShouldResume, onResume} = useHomeContext();
+  const { handleQuestionTrigger, shouldResume, setShouldResume, onResume, answeredQuestions } = useHomeContext();
+
+  // Referencia para evitar disparar repetidamente el modal
+  const modalTriggeredRef = useRef(false);
 
   const opts = {
     height: "390",
@@ -25,37 +28,50 @@ export const UseVideoPlayer = () => {
     playerRef.current = event.target;
   };
 
-  // Monitorear el tiempo de reproducción para pausar en breakpoints
   useEffect(() => {
     const interval = setInterval(() => {
       if (playerRef.current && !isPaused) {
         const time = playerRef.current.getCurrentTime();
         setCurrentTime(time);
 
-        // Revisar si el tiempo coincide con un breakpoint
-        const foundQuestion = questions.some((q) => Math.floor(q.time) === Math.floor(time));
-        if (foundQuestion) {
-          playerRef.current.pauseVideo();
-          setIsPaused(true);
-          const questionIndex = questions.findIndex((q) => Math.floor(q.time) === Math.floor(time));
-          handleQuestionTrigger(questionIndex);
+        // Obtener el siguiente breakpoint pendiente
+        const unansweredQuestions = questions
+          .map((q, index) => ({ ...q, index }))
+          .filter(({ index }) => !answeredQuestions.includes(index))
+          .sort((a, b) => a.time - b.time);
+
+        if (unansweredQuestions.length > 0) {
+          const nextUnanswered = unansweredQuestions[0];
+          const tolerance = 0.5; // margen de 0.5 segundos
+
+          // Si el tiempo es mayor o igual al breakpoint menos el margen
+          if (time >= nextUnanswered.time - tolerance) {
+            if (!modalTriggeredRef.current) {
+              // Forzamos el seek al breakpoint y disparamos el modal
+              playerRef.current.seekTo(nextUnanswered.time, true);
+              modalTriggeredRef.current = true;
+              playerRef.current.pauseVideo();
+              setIsPaused(true);
+              handleQuestionTrigger(nextUnanswered.index);
+            }
+          }
         }
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, answeredQuestions, handleQuestionTrigger]);
 
-  // Verifica si debe reanudar el vídeo cuando la respuesta es correcta
+  // Reanudar el vídeo cuando se haya contestado la pregunta
   useEffect(() => {
     if (shouldResume && playerRef.current) {
       playerRef.current.playVideo();
       setIsPaused(false);
-      onResume(); // Resetea onResume en el contexto
+      onResume(); // Resetea la bandera en el contexto
+      // Reiniciamos la bandera para permitir disparar el modal en el siguiente breakpoint
+      modalTriggeredRef.current = false;
     }
-  }, [shouldResume]);
-  
+  }, [shouldResume, onResume]);
+
   return { playerRef, opts, onReady };
 };
-
-

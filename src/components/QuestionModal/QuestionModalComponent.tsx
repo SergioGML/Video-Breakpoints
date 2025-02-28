@@ -1,29 +1,35 @@
+// QuestionModalComponent.tsx
 import { questions } from "../../data/questions";
 import { useHomeContext } from "../../context/HomeContext";
 
-
 const QuestionModal = () => {
-
-  const { setIsCorrect, activeQuestion, setActiveQuestion, setShouldResume, isCorrect} = useHomeContext();  
-
+  const { setIsCorrect, activeQuestion, setActiveQuestion, setShouldResume, isCorrect, answeredQuestions, setAnsweredQuestions } = useHomeContext();  
 
   const handleAnswer = (selectedAnswer: string) => {
     setIsCorrect(null);
     const correctAnswer = questions[activeQuestion!].correctAnswer;
     if (selectedAnswer === correctAnswer) {
       setIsCorrect(true);
+      // Marcar la pregunta como contestada
+      if (activeQuestion !== null && !answeredQuestions.includes(activeQuestion)) {
+        setAnsweredQuestions([...answeredQuestions, activeQuestion]);
+      }
       setTimeout(() => {
         setActiveQuestion(null);
-        setShouldResume(true); // Activamos la reanudación automática del vídeo
-      }, 2000); // 2 segundos mostrando "Correcto"
+        setShouldResume(true); // Reanuda el vídeo automáticamente tras 2 segundos
+      }, 2000);
     } else {
       setIsCorrect(false);
     }
   };
 
   const handleCloseModal = () => {
+    setIsCorrect(null);
+    if (activeQuestion !== null && !answeredQuestions.includes(activeQuestion)) {
+      setAnsweredQuestions([...answeredQuestions, activeQuestion]);
+    }
     setActiveQuestion(null);
-    setShouldResume(true); // Reanuda el vídeo después de un fallo (al presionar "Continuar")
+    setShouldResume(true); // Reanuda el vídeo tras presionar "Continuar"
   };
 
   if (activeQuestion === null) return null;
@@ -35,8 +41,8 @@ const QuestionModal = () => {
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.3)", // Más transparente
-        backdropFilter: "blur(5px)", // Desenfoque manual
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        backdropFilter: "blur(5px)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -87,3 +93,4 @@ const QuestionModal = () => {
 };
 
 export default QuestionModal;
+
