@@ -23,7 +23,9 @@ interface HomeContextProps {
 
 const HomeContext = createContext<HomeContextProps>({} as HomeContextProps);
 
-export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [shouldResume, setShouldResume] = useState<boolean>(false);

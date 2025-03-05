@@ -99,4 +99,3 @@ const QuestionModal: React.FC = () => {
 };
 
 export default QuestionModal;
-

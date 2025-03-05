@@ -11,6 +11,10 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
   const [duration, setDuration] = useState(0);
   const { handleQuestionTrigger, shouldResume, onResume, answeredQuestions } = useHomeContext();
   const modalTriggeredRef = useRef(false);
+  
+  // Estado para el volumen y mute
+  const [volume, setVolume] = useState(50);
+  const [isMuted, setIsMuted] = useState(false);
 
   const opts = {
     height: isFullScreen ? window.innerHeight.toString() : "423",
@@ -28,6 +32,7 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
     playerRef.current = event.target;
     const videoDuration = event.target.getDuration();
     setDuration(videoDuration);
+    event.target.setVolume(volume);
   };
 
   useEffect(() => {
@@ -43,7 +48,7 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
 
         if (unansweredQuestions.length > 0) {
           const nextUnanswered = unansweredQuestions[0];
-          const tolerance = 0.5; // margen de 0.5 segundos
+          const tolerance = 0.5;
           if (time >= nextUnanswered.time - tolerance) {
             if (!modalTriggeredRef.current) {
               playerRef.current.seekTo(nextUnanswered.time, true);
@@ -82,10 +87,12 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
 
   const toggleMute = () => {
     if (!playerRef.current) return;
-    if (playerRef.current.isMuted()) {
+    if (isMuted) {
       playerRef.current.unMute();
+      setIsMuted(false);
     } else {
       playerRef.current.mute();
+      setIsMuted(true);
     }
   };
 
@@ -105,6 +112,18 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
     setCurrentTime(newTime);
   };
 
+  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!playerRef.current) return;
+    const newVolume = parseFloat(event.target.value);
+    playerRef.current.setVolume(newVolume);
+    setVolume(newVolume);
+    if (newVolume > 0) {
+      setIsMuted(false);
+    } else {
+      setIsMuted(true);
+    }
+  };
+
   return {
     playerRef,
     opts,
@@ -116,6 +135,8 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
     toggleMute,
     handleProgressClick,
     handleProgressChange,
+    volume,
+    isMuted,
+    handleVolumeChange,
   };
 };
-

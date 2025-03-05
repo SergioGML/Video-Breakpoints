@@ -1,7 +1,7 @@
 import React from "react";
 import YouTube from "react-youtube";
 import { UseVideoPlayer } from "../../hooks/useVideoPlayer";
-import VideoControls from "../VideoPlayer/VideoControls";
+import VideoControls from "./VideoControls";
 
 interface VideoComponentProps {
   videoId: string;
@@ -18,6 +18,9 @@ const VideoComponent: React.FC<VideoComponentProps> = ({ videoId, isFullScreen =
     isPaused,
     toggleMute,
     handleProgressChange,
+    volume,
+    isMuted,
+    handleVolumeChange,
   } = UseVideoPlayer(isFullScreen);
 
   return (
@@ -30,9 +33,13 @@ const VideoComponent: React.FC<VideoComponentProps> = ({ videoId, isFullScreen =
          isPaused={isPaused}
          toggleMute={toggleMute}
          handleProgressChange={handleProgressChange}
+         volume={volume}
+         isMuted={isMuted}
+         handleVolumeChange={handleVolumeChange}
       />
     </div>
   );
 };
 
 export default VideoComponent;
+

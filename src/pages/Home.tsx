@@ -1,9 +1,8 @@
-// pages/Home.tsx
 import React, { useState } from "react";
-import VideoComponent from "../components/VideoPlayer/VideoComponent";
-import QuestionModal from "../components/QuestionModal/ModalComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquareFull } from "@fortawesome/free-regular-svg-icons";
+import VideoComponent from "../components/VideoPlayer/VideoComponent";
+import QuestionModal from "../components/QuestionModal/ModalComponent";
 
 const Home: React.FC = () => {
   const [isSimulatedFullScreen, setIsSimulatedFullScreen] = useState(false);
@@ -51,3 +50,4 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
