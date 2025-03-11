@@ -1,19 +1,29 @@
-// components/VideoControls.tsx
-import React, { useState, useRef } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faPause,
+  faVolumeMute,
+  faVolumeUp,
+  faExpand,
+} from "@fortawesome/free-solid-svg-icons";
 import { formatTime } from "../../utils/timeFormatter";
+import { questions } from "../../data/questions"; // Para dibujar los marcadores
+import styles from "./Video.module.css";
 
 interface VideoControlsProps {
   currentTime: number;
   duration: number;
   togglePlay: () => void;
   isPaused: boolean;
-  toggleMute: () => void;
+  toggleMute?: () => void;
   handleProgressChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  volume: number;
-  isMuted: boolean;
-  handleVolumeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  volume?: number;
+  isMuted?: boolean;
+  handleVolumeChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFullScreenToggle?: () => void;
+  // Opcional: si quieres permitir clic en los marcadores
+  onMarkerClick?: (time: number) => void;
 }
 
 const VideoControls: React.FC<VideoControlsProps> = ({
@@ -23,91 +33,93 @@ const VideoControls: React.FC<VideoControlsProps> = ({
   isPaused,
   toggleMute,
   handleProgressChange,
-  volume,
-  isMuted,
+  volume = 50,
+  isMuted = false,
   handleVolumeChange,
+  onFullScreenToggle,
+  onMarkerClick,
 }) => {
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const volumeTimerRef = useRef<number | null>(null);
-
-  const handleVolumeMouseDown = () => {
-    volumeTimerRef.current = window.setTimeout(() => {
-      setShowVolumeSlider(true);
-    }, 500);
-  };
-
-  const handleVolumeMouseUp = () => {
-    if (volumeTimerRef.current) {
-      clearTimeout(volumeTimerRef.current);
-      volumeTimerRef.current = null;
-      if (!showVolumeSlider) {
-        // Si no se mostró el slider, se trata de un click corto: toggle mute.
-        toggleMute();
-      }
-    }
-  };
-
-  const handleVolumeMouseLeave = () => {
-    if (volumeTimerRef.current) {
-      clearTimeout(volumeTimerRef.current);
-      volumeTimerRef.current = null;
+  // Maneja el clic en los marcadores (opcional)
+  const handleMarkerClick = (time: number) => {
+    if (onMarkerClick) {
+      onMarkerClick(time);
     }
   };
 
   return (
-    <div className="w-full max-w-[752px] mt-2 px-4">
-      <div className="flex items-center justify-between">
-        <button onClick={togglePlay} className=" text-2xl">
+    <div className={styles.vcContainer}>
+      {/* Grupo Izquierdo (Play/Pause) */}
+      <div className={styles.vcLeftGroup}>
+        <button onClick={togglePlay} className={styles.vcIconButton}>
           {isPaused ? (
             <FontAwesomeIcon icon={faPlay} />
           ) : (
             <FontAwesomeIcon icon={faPause} />
           )}
         </button>
-        <div className="relative">
-          <button
-            onMouseDown={handleVolumeMouseDown}
-            onMouseUp={handleVolumeMouseUp}
-            onMouseLeave={handleVolumeMouseLeave}
-            className="text-2xl ml-4"
-          >
-            {isMuted ? (
-              <FontAwesomeIcon icon={faVolumeMute} />
-            ) : (
-              <FontAwesomeIcon icon={faVolumeUp} />
-            )}
-          </button>
-          {showVolumeSlider && (
-            <div className="absolute top-0 left-full ml-2 flex items-center bg-white p-1 rounded shadow">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-24 cursor-pointer"
+      </div>
+
+      {/* Grupo Central: Barra de progreso + marcadores */}
+      <div className={styles.vcCenterGroup}>
+        <div className={styles.vcProgressContainer}>
+          {/* Barra de progreso */}
+          <input
+            type="range"
+            min="0"
+            max={duration}
+            step="0.1"
+            value={currentTime}
+            onChange={handleProgressChange}
+            className={styles.vcProgressBar}
+          />
+
+          {/* Marcadores de preguntas */}
+          {questions.map((q, index) => {
+            const leftPercent = (q.time / duration) * 100;
+            return (
+              <div
+                key={index}
+                className={styles.vcMarker}
+                style={{ left: leftPercent + "%" }}
+                onClick={() => handleMarkerClick(q.time)}
               />
-              <button onClick={() => setShowVolumeSlider(false)} className="ml-2 text-sm">
-                x
-              </button>
-            </div>
-          )}
+            );
+          })}
         </div>
-        <span className="ml-4 text-sm">
+      </div>
+
+      {/* Grupo Derecho: volumen, tiempo, fullscreen */}
+      <div className={styles.vcRightGroup}>
+        {toggleMute && handleVolumeChange && (
+          <div className={styles.vcVolumeContainer}>
+            <button onClick={toggleMute} className={styles.vcIconButton}>
+              {isMuted ? (
+                <FontAwesomeIcon icon={faVolumeMute} />
+              ) : (
+                <FontAwesomeIcon icon={faVolumeUp} />
+              )}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={volume}
+              onChange={handleVolumeChange}
+              className={styles.vcVolumeSlider}
+            />
+          </div>
+        )}
+
+        <span className={styles.vcTimeText}>
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
-      </div>
-      <div className="mt-2">
-        <input
-          type="range"
-          min="0"
-          max={duration}
-          step="0.1"
-          value={currentTime}
-          onChange={handleProgressChange}
-          className="w-full cursor-pointer"
-        />
+
+        {onFullScreenToggle && (
+          <button onClick={onFullScreenToggle} className={styles.vcIconButton}>
+            <FontAwesomeIcon icon={faExpand} />
+          </button>
+        )}
       </div>
     </div>
   );

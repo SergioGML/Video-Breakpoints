@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { questions } from "../data/questions";
 
 interface HomeContextProps {
   activeQuestion: number | null;
@@ -9,6 +10,11 @@ interface HomeContextProps {
   volume: number;
   isMuted: boolean;
   time: number;
+  questionAnswers: (boolean | null)[]; // Array que registra si cada pregunta fue contestada (true/false) o aún no (null)
+  showFinalModal: boolean; // Estado para mostrar el modal final
+
+  setShowFinalModal: (value: boolean) => void;
+  setQuestionAnswers: (value: (boolean | null)[]) => void;
   setActiveQuestion: (value: number | null) => void;
   setIsCorrect: (value: boolean | null) => void;
   setAnsweredQuestions: (value: number[]) => void;
@@ -34,6 +40,13 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
   const [time, setTime] = useState(0);
+
+  // Inicializamos questionAnswers con un array del mismo tamaño que questions, todo en null
+  const [questionAnswers, setQuestionAnswers] = useState<(boolean | null)[]>(
+    () => questions.map(() => null),
+  );
+
+  const [showFinalModal, setShowFinalModal] = useState(false);
 
   const handleQuestionTrigger = (questionIndex: number) => {
     if (answeredQuestions.includes(questionIndex)) return;
@@ -64,6 +77,10 @@ export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsMuted,
         time,
         setTime,
+        questionAnswers,
+        setQuestionAnswers,
+        showFinalModal,
+        setShowFinalModal,
         handleQuestionTrigger,
         onResume,
       }}

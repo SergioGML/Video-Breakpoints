@@ -1,53 +1,39 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareFull } from "@fortawesome/free-regular-svg-icons";
 import VideoComponent from "../components/VideoPlayer/VideoComponent";
-import QuestionModal from "../components/QuestionModal/ModalComponent";
+import Modal from "../components/QuestionModal/Modal";
+import FinalModal from "../components/QuestionModal/FinalModal";
+import styles from "../pages/Home.module.css";
 
 const Home: React.FC = () => {
-  const [isSimulatedFullScreen, setIsSimulatedFullScreen] = useState(false);
+  const [isSimulatedFullScreen, setIsSimulatedFullScreen] = useState<boolean>(false);
 
-  const toggleSimulatedFullScreen = () => {
+  const toggleSimulatedFullScreen = (): void => {
     setIsSimulatedFullScreen((prev) => !prev);
   };
 
+  const container = isSimulatedFullScreen
+    ? styles.fullScreenContainer
+    : styles.container;
+
+  const videoContainer = isSimulatedFullScreen
+    ? `${styles.videoContainer} ${styles.fullScreenVideoContainer}`
+    : `${styles.videoContainer} ${styles.normalVideoContainer}`;
+
   return (
-    <div
-      className={
-        isSimulatedFullScreen
-          ? "fixed inset-0 flex items-center justify-center bg-black"
-          : "flex min-h-screen flex-col items-center justify-center bg-gray-100"
-      }
-    >
-      <div
-        className={`relative flex flex-col items-center justify-center ${
-          isSimulatedFullScreen ? "h-[100vh] w-[100vw]" : ""
-        }`}
-      >
-        <h1
-          className={`mb-4 text-2xl font-bold ${
-            isSimulatedFullScreen ? "text-white" : ""
-          }`}
-        >
-          YouTube
-        </h1>
-
-        <VideoComponent videoId="KPcHiQ0wpBw" isFullScreen={isSimulatedFullScreen} />
-        <QuestionModal />
-
-        <button
-          onClick={toggleSimulatedFullScreen}
-          className="absolute bottom-4 right-4 z-50 py-3 px-4 text-lg bg-gray-800 text-white cursor-pointer rounded hover:transform hover:scale-110"
-        >
-          <FontAwesomeIcon
-            icon={faSquareFull}
-            className={isSimulatedFullScreen ? "p-5 px-6 text-2xl" : ""}
-          />
-        </button>
+    <div className={container}>
+      <div className={videoContainer}>
+        <VideoComponent
+          videoId="5m-R7XxFLCs"
+          isFullScreen={isSimulatedFullScreen}
+          onFullScreenToggle={toggleSimulatedFullScreen}
+        />
+        <Modal />
+        <FinalModal />
       </div>
     </div>
   );
 };
 
 export default Home;
+
 

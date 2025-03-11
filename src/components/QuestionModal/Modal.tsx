@@ -1,8 +1,9 @@
 import React from "react";
 import { questions } from "../../data/questions";
 import { useHomeContext } from "../../context/HomeContext";
+import styles from "../../components/QuestionModal/Modals.module.css";
 
-const QuestionModal: React.FC = () => {
+const Modal: React.FC = () => {
   const {
     setIsCorrect,
     activeQuestion,
@@ -11,14 +12,24 @@ const QuestionModal: React.FC = () => {
     isCorrect,
     answeredQuestions,
     setAnsweredQuestions,
+    questionAnswers,
+    setQuestionAnswers,
   } = useHomeContext();
 
   const handleAnswer = (selectedAnswer: string) => {
+    if (activeQuestion === null) return;
+    const correctAnswer = questions[activeQuestion].correctAnswer;
+    const isAnswerCorrect = selectedAnswer === correctAnswer;
+
+    // Actualizamos questionAnswers en la posición de la pregunta actual
+    const updatedAnswers = [...questionAnswers];
+    updatedAnswers[activeQuestion] = isAnswerCorrect;
+    setQuestionAnswers(updatedAnswers);
+
     setIsCorrect(null);
-    const correctAnswer = questions[activeQuestion!].correctAnswer;
-    if (selectedAnswer === correctAnswer) {
+    if (isAnswerCorrect) {
       setIsCorrect(true);
-      if (activeQuestion !== null && !answeredQuestions.includes(activeQuestion)) {
+      if (!answeredQuestions.includes(activeQuestion)) {
         setAnsweredQuestions([...answeredQuestions, activeQuestion]);
       }
       setTimeout(() => {
@@ -31,8 +42,9 @@ const QuestionModal: React.FC = () => {
   };
 
   const handleCloseModal = () => {
+    if (activeQuestion === null) return;
     setIsCorrect(null);
-    if (activeQuestion !== null && !answeredQuestions.includes(activeQuestion)) {
+    if (!answeredQuestions.includes(activeQuestion)) {
       setAnsweredQuestions([...answeredQuestions, activeQuestion]);
     }
     setActiveQuestion(null);
@@ -42,33 +54,19 @@ const QuestionModal: React.FC = () => {
   if (activeQuestion === null) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        backdropFilter: "blur(5px)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 50,
-      }}
-    >
-      <div className="rounded-lg bg-white p-6 text-center shadow-lg">
-        {isCorrect === null ? (
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
+        {isCorrect === null && (
           <>
-            <h2 className="mb-4 text-xl font-bold">
+            <h2 className={styles.questionTitle}>
               {questions[activeQuestion].question}
             </h2>
-            <ul>
+            <ul className={styles.optionsList}>
               {questions[activeQuestion].options.map((option, index) => (
-                <li key={index} className="mb-2">
+                <li key={index}>
                   <button
                     onClick={() => handleAnswer(option)}
-                    className="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className={`${styles.button} ${styles.answerButton}`}
                   >
                     {option}
                   </button>
@@ -76,18 +74,20 @@ const QuestionModal: React.FC = () => {
               ))}
             </ul>
           </>
-        ) : isCorrect ? (
-          <h2 className="text-2xl font-bold text-green-500">✅ ¡Correcto!</h2>
-        ) : (
+        )}
+        {isCorrect === true && (
+          <h2 className={styles.correctText}>✅ ¡Correcto!</h2>
+        )}
+        {isCorrect === false && (
           <>
-            <h2 className="mb-4 text-2xl font-bold text-red-500">❌ Incorrecto</h2>
-            <p className="text-lg font-semibold">La respuesta correcta es:</p>
-            <p className="text-lg font-bold text-blue-600">
+            <h2 className={styles.incorrectText}>❌ Incorrecto</h2>
+            <p className={styles.answerText}>La respuesta correcta es:</p>
+            <p className={styles.correctAnswer}>
               {questions[activeQuestion].correctAnswer}
             </p>
             <button
               onClick={handleCloseModal}
-              className="mt-4 w-full rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+              className={`${styles.button} ${styles.continueButton}`}
             >
               Continuar
             </button>
@@ -98,4 +98,4 @@ const QuestionModal: React.FC = () => {
   );
 };
 
-export default QuestionModal;
+export default Modal;

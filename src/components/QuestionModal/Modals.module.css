@@ -1,0 +1,104 @@
+/* QuestionModal.module.css */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.questionTitle {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.answerButton {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.continueButton {
+  background-color: #ef4444;
+  color: white;
+  margin-top: 16px;
+}
+
+.closeButton {
+  margin-top: 16px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #3b82f6;
+  color: white;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.text{
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.correctText {
+  font-size: 24px;
+  font-weight: bold;
+  color: #22c55e;
+  margin-bottom: 16px;
+}
+
+.incorrectText {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.optionsList {
+  list-style: none;
+  padding: 0;
+}
+
+.answerText {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.correctAnswer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #3b82f6;
+}
