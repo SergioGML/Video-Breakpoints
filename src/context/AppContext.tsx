@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 import { questions } from "../data/questions";
 
+//Contexto que se encarga de manejar el estado de la aplicación.
+
 interface HomeContextProps {
   activeQuestion: number | null;
   isCorrect: boolean | null;
@@ -27,11 +29,12 @@ interface HomeContextProps {
   onResume: () => void;
 }
 
-const HomeContext = createContext<HomeContextProps>({} as HomeContextProps);
+//Se crea el contexto como objeto vacío y mediante type assertion se le asigna el tipo HomeContextProps.
+const HomeContext = createContext<HomeContextProps>({} as HomeContextProps); 
 
-export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+//Componente que se encarga de manejar el estado de la aplicación.
+export const HomeProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
+  
   const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [shouldResume, setShouldResume] = useState<boolean>(false);

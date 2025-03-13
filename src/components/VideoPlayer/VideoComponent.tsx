@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import YouTube from "react-youtube";
-import { UseVideoPlayer } from "../../hooks/useVideoPlayer";
-import { useHomeContext } from "../../context/HomeContext";
 import VideoControls from "./VideoControls";
+import { UseVideoPlayer } from "../../hooks/useVideoPlayer";
+import { useHomeContext } from "../../context/AppContext";
 import styles from "./Video.module.css";
+
+//Componente que renderiza el video, coordina la visualziación del video y controla el sistema de preguntas.
 
 interface VideoComponentProps { //Interfaz que define las propiedades que recibe el componente y su type.
   videoId: string;
@@ -19,16 +21,16 @@ const VideoComponent: React.FC<VideoComponentProps> = ({ //Componente funcional 
   const { //Se obtienen las propiedades del hook UseVideoPlayer.
     playerRef,
     opts,
-    onReady,
-    onStateChange,
     currentTime,
     duration,
-    togglePlay,
     isPaused,
-    toggleMute,
-    handleProgressChange,
     volume,
     isMuted,
+    onReady,
+    onStateChange,
+    togglePlay,
+    toggleMute,
+    handleProgressChange,
     handleVolumeChange,
   } = UseVideoPlayer(isFullScreen);
 
@@ -62,22 +64,22 @@ const VideoComponent: React.FC<VideoComponentProps> = ({ //Componente funcional 
   return (
     <div className={containerClasses}>
       <YouTube
+        className={youtubeClasses}
         videoId={videoId}
         opts={opts}
         onReady={onReady}
         onStateChange={onStateChange}
-        className={youtubeClasses}
       />
       <div className={styles.controlsContainer}>
         <VideoControls
           currentTime={currentTime}
           duration={duration}
-          togglePlay={togglePlay}
           isPaused={isPaused}
-          toggleMute={toggleMute}
-          handleProgressChange={handleProgressChange}
           volume={volume}
           isMuted={isMuted}
+          togglePlay={togglePlay}
+          toggleMute={toggleMute}
+          handleProgressChange={handleProgressChange}
           handleVolumeChange={handleVolumeChange}
           onFullScreenToggle={onFullScreenToggle}
         />

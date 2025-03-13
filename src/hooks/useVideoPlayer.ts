@@ -1,24 +1,29 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import { questions } from "../data/questions";
-import { useHomeContext } from "../context/HomeContext";
+import { useHomeContext } from "../context/AppContext";
 
-enum PlayerState { //Estados posibles del reproductor de YouTube
+//Hook que gestiona e integra la reproducción del vídeo coordinando la aparición de modales.
+
+//Estados posibles del reproductor de YouTube
+enum PlayerState { 
   ENDED = 0, //El vídeo ha terminado.
   PLAYING = 1, //El vídeo se está reproduciendo.
   PAUSED = 2, //El vídeo está pausado.
   BUFFERING = 3, //El vídeo se está cargando.
 }
 
+//Hook personalizado para el reproductor de YouTube
 export const UseVideoPlayer = (isFullScreen: boolean) => {
-  //Hook personalizado para el reproductor de YouTube
   const playerRef = useRef<YouTubePlayer | null>(null); //Referencia al reproductor de YouTube
   const [currentTime, setCurrentTime] = useState(0); //Estado para el tiempo actual del vídeo
   const [isPaused, setIsPaused] = useState(false); //Estado para saber si el vídeo está pausado
   const [duration, setDuration] = useState(0); //Estado para la duración del vídeo
+  const modalTriggeredRef = useRef(false); //Referencia para saber si se ha activado el modal. Ayuda a saber si se ha activado ya un modal para no disparar otra vez una pregunta.
+  const [volume, setVolume] = useState(50); //Estado para el volumen del vídeo
+  const [isMuted, setIsMuted] = useState(false); //Estado para saber si el vídeo está muteado
 
-  const {
-    //Extrae los valores del contexto
+  const { //Extrae los estados y funciones del contexto
     activeQuestion,
     handleQuestionTrigger,
     shouldResume,
@@ -27,10 +32,6 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
     setShowFinalModal,
     questionAnswers,
   } = useHomeContext();
-
-  const modalTriggeredRef = useRef(false); //Referencia para saber si se ha activado el modal. Ayuda a saber si se ha activado ya un modal para no disparar otra vez una pregunta.
-  const [volume, setVolume] = useState(50); //Estado para el volumen del vídeo
-  const [isMuted, setIsMuted] = useState(false); //Estado para saber si el vídeo está muteado
 
   const opts = {
     //Opciones del reproductor de YouTube
@@ -48,7 +49,7 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
     },
   };
 
-  const TOLERANCE = 0.5; //Tolerancia para activar modal de preguntas. Compensa retrasos en la medición del tiempo.
+  const TOLERANCE = 0.5; //Margen de 0,5sg para activar modal de preguntas. Compensa pequeños desfases en la medición del tiempo.
 
   const onStateChange = useCallback(
     (event: any) => {
@@ -70,8 +71,8 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
           // Buscamos la siguiente pregunta pendiente según el tiempo
           const unanswered = questions // Filtra las preguntas que no han sido contestadas
             .map((q, index) => ({ ...q, index })) // Añade el índice de la pregunta
-            .filter(({ index }) => questionAnswers[index] === null) // Filtra las preguntas que no han sido contestadas
-            .sort((a, b) => a.time - b.time); // Ordena las preguntas por tiempo
+            .filter(({ index }) => questionAnswers[index] === null) // Filtra el array resultante, se extrae index y se verifica si la respuesta es null. Si es null, esa pregunta no ha sido contestada y se conserva.
+            .sort((a, b) => a.time - b.time); // Ordena el array filtrado por tiempo en orden ascendente.
           const unansweredAfterCurrent = unanswered.filter(
             (q) => q.time > currentTime,
           ); // Filtra las preguntas que no han sido contestadas y están después del tiempo actual
@@ -113,8 +114,8 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
 
         const unanswered = questions // Filtra las preguntas que no han sido contestadas
           .map((q, index) => ({ ...q, index })) // Añade el índice de la pregunta
-          .filter(({ index }) => questionAnswers[index] === null) // Filtra las preguntas que no han sido contestadas
-          .sort((a, b) => a.time - b.time); // Ordena las preguntas por tiempo
+          .filter(({ index }) => questionAnswers[index] === null) // Filtra el array resultante, se extrae index y se verifica si la respuesta es null. Si es null, esa pregunta no ha sido contestada y se conserva.
+          .sort((a, b) => a.time - b.time); // Ordena el array filtrado por tiempo en orden ascendente.
 
         if (unanswered.length > 0) {
           // Si hay preguntas sin contestar
@@ -206,17 +207,17 @@ export const UseVideoPlayer = (isFullScreen: boolean) => {
   return {
     playerRef,
     opts,
+    duration,
+    currentTime,
+    isPaused,
+    volume,
+    isMuted,
     onReady,
     onStateChange,
-    currentTime,
-    duration,
     togglePlay,
-    isPaused,
     toggleMute,
     handleProgressClick,
     handleProgressChange,
-    volume,
-    isMuted,
     handleVolumeChange,
   };
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HomeProvider } from "./context/HomeContext";
-import Home from "./pages/Home";
+import { HomeProvider } from "./context/AppContext";
+import App from "./App";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <HomeProvider>
-      <Home />
+      <App />
     </HomeProvider>
   </React.StrictMode>
 );

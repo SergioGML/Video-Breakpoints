@@ -1,21 +1,21 @@
 export const questions = [
     {
-      time: 15,
-      question: "¿Quién creó el Anillo de Poder?",
-      options: ["Merlín", "Sauron", "Voldemort"],
-      correctAnswer: "Sauron",
+      time: 35,
+      question: "¿Cuál es el planeta más caliente del Sistema Solar?",
+      options: ["Venus", "Mercurio", "Marte"],
+      correctAnswer: "Venus",
     },
     {
-      time: 45,
-      question: "¿Quién creó a Dardo, la espada de Frodo?",
-      options: ["Los hombres", "Los enanos", "Los elfos"],
-      correctAnswer: "Los elfos",
+      time: 105,
+      question: "¿Qué es una estrella fugaz?",
+      options: ["Una estrella que viaja por el cielo", "Un meteorito entrando a la atmósfera", "Un cometa a gran velocidad"],
+      correctAnswer: "Un meteorito entrando a la atmósfera",
     },
     {
-      time: 85 ,
-      question: "¿Cuantos Horrocruxes creó Voldemort?",
-      options: ["Sólo 1", "En total: 10", "Contando con Harry: 7"],
-      correctAnswer: "Contando con Harry: 7",
+      time: 205 ,
+      question: "¿Cuál es la galaxia en la que vivimos?",
+      options: ["Andrómeda", "Vía Láctea", "Nebulosa del Cangrejo"],
+      correctAnswer: "Vía Láctea",
     },
   ];
   
